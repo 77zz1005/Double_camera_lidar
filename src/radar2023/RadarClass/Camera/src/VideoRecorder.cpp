@@ -49,5 +49,6 @@ void VideoRecorder::write(Mat src)
 
 void VideoRecorder::close()
 {
-    this->vw.release();
+    this->vw[0].release();    
+    this->vw[1].release();
 }

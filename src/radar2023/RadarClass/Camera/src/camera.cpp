@@ -175,7 +175,7 @@ void MV_Camera::uninit()
 }
 
 // changed
-void MV_Camera::setExposureTime(int ex, int camera_index)
+void MV_Camera::setExposureTime(int camera_index,int ex)
 {
     if (this->hCamera[camera_index] == -1)
         return;
@@ -355,7 +355,7 @@ void CameraThread::adjustExposure(int camera_index)
     while (framebag.flag && waitKey(1) != 81 && waitKey(1) != 113 && getTrackbarPos("Quit", window_name) == 0)
     {
         // 获取滑动条value 并设置相机的曝光时间和增益
-        this->_cap->setExposureTime(getTrackbarPos("ex", window_name));
+        this->_cap->setExposureTime(getTrackbarPos("ex", window_name),camera_index);
         this->_cap->setGain(getTrackbarPos("gain", window_name));
 
         // 显示图像

@@ -88,7 +88,9 @@ void ArmorDetector::reBuildBoxs(vector<vector<TRTInferV1::DetectionObj>> &armors
         return;
     for (size_t i = 0; i < boxs.size(); ++i)
     {
-        // CHECK
+        for (auto &it : armors[i])
+        {
+                    // CHECK
         float x0 = (float)it.x1 + boxs[i].x1;
         float y0 = (float)it.y1 + boxs[i].y1;
         float w = abs((float)(it.x2 - it.x1));
@@ -109,8 +111,7 @@ void ArmorDetector::reBuildBoxs(vector<vector<TRTInferV1::DetectionObj>> &armors
         {
             h = ImageH - y0;
         }
-        for (auto &it : armors[i])
-        {
+
             this->results.emplace_back(bboxAndRect{ArmorBoundingBox{true,
                                                                     x0, y0,
                                                                     w,

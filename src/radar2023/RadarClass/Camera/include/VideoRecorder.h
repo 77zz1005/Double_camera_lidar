@@ -20,7 +20,7 @@ public:
     VideoRecorder();
     ~VideoRecorder();
 
-    bool init(ind camera_index, const char *videoPath, int coder, Size size); // add index
+    bool init(int camera_index, const char *videoPath, int coder, Size size); // add index
     void write(Mat src);
     void close();
 };

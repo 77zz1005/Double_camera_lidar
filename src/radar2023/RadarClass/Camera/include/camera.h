@@ -22,7 +22,7 @@ public:
 
 private:
     int iCameraCounts = 0;
-    int iStatus[2] = {-1, -1};
+    int iStatus=-1;//share 2
     tSdkCameraDevInfo tCameraEnumList[2]; // 枚举
     int hCamera[2] = {-1, -1};            // 存储两个相机的句柄
     tSdkCameraCapbility tCapability[2];
@@ -47,7 +47,13 @@ public:
 
     void uninit(); // share 2
 
-    void setExposureTime(int ex = 30, int camera_index); // add index
+    void setExposureTime(int camera_index,int ex = 30); // add index
+    //C++
+    /*
+    Err: void setExposureTime(int ex = 30, int camera_index)
+    默认参数位置问题：在声明函数setExposureTime时，默认参数应该在非默认参数之后。例如，应该这样声明函数：
+    void setExposureTime(int camera_index, int ex = 30); // add index
+    */
     void setGain(int gain, int camera_index);            // add index
 
     void saveParam(int camera_index, const char tCameraConfigPath[23]); // add index

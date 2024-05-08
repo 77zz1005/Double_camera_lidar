@@ -27,7 +27,8 @@ public:
     DepthQueue(vector<Matrix<float, 3, 3>> &K_0, vector<Matrix<float, 1, 5>> &C_0, vector<Matrix<float, 4, 4>> &E_0);
     ~DepthQueue();
 
-    int getProcessQueueSize() { return processQueue.size(); };
+    //好像没用
+    // int getProcessQueueSize() { return processQueue[camera_index].size(); }
 
     vector<vector<float>> pushback(int camera_index, pcl::PointCloud<pcl::PointXYZ> &pc);
 };

@@ -141,19 +141,19 @@ int main(int argc, char **argv)
         if (!left_result_image || left_result_image->image.empty())
             continue;
         Mat left_display = Mat::zeros(Size(left_result_image->image.cols + left_result_image->image.rows * 0.54, left_result_image->image.rows), CV_8UC3);
-        left_result_image->image.copyTo(display(Rect(0, 0, left_result_image->image.cols, left_result_image->image.rows)));
+        left_result_image->image.copyTo(left_display(Rect(0, 0, left_result_image->image.cols, left_result_image->image.rows)));
         if (!map.empty())
         {
-            cv::resize(map, display(Rect(left_result_image->image.cols, 0, left_result_image->image.rows * 0.54, left_result_image->image.rows)), Size(left_result_image->image.rows * 0.54, left_result_image->image.rows));
+            cv::resize(map, left_display(Rect(left_result_image->image.cols, 0, left_result_image->image.rows * 0.54, left_result_image->image.rows)), Size(left_result_image->image.rows * 0.54, left_result_image->image.rows));
         }
         // right
         if (!right_result_image || right_result_image->image.empty())
             continue;
         Mat right_display = Mat::zeros(Size(right_result_image->image.cols + right_result_image->image.rows * 0.54, right_result_image->image.rows), CV_8UC3);
-        right_result_image->image.copyTo(display(Rect(0, 0, right_result_image->image.cols, right_result_image->image.rows)));
+        right_result_image->image.copyTo(right_display(Rect(0, 0, right_result_image->image.cols, right_result_image->image.rows)));
         if (!map.empty())
         {
-            cv::resize(map, display(Rect(right_result_image->image.cols, 0, right_result_image->image.rows * 0.54, right_result_image->image.rows)), Size(right_result_image->image.rows * 0.54, right_result_image->image.rows));
+            cv::resize(map, right_display(Rect(right_result_image->image.cols, 0, right_result_image->image.rows * 0.54, right_result_image->image.rows)), Size(right_result_image->image.rows * 0.54, right_result_image->image.rows));
         }
 
         for (auto it : locs) // share 2
@@ -181,8 +181,8 @@ int main(int argc, char **argv)
             Point2f l_center = Point2f((it.y / 15.0) * left_result_image->image.rows * 0.54 + left_result_image->image.cols, (it.x / 28.0) * left_result_image->image.rows);
             Point2f r_center = Point2f((it.y / 15.0) * right_result_image->image.rows * 0.54 + right_result_image->image.cols, (it.x / 28.0) * right_result_image->image.rows);
             // add
-            circle(left_display, center, 40.0, color, 3);
-            circle(right_display, center, 40.0, color, 3);
+            circle(left_display, l_center, 40.0, color, 3);
+            circle(right_display, r_center, 40.0, color, 3);
 
             text += to_string(it.id);
             int baseline;
@@ -193,8 +193,8 @@ int main(int argc, char **argv)
             r_center.x = r_center.x - text_size.width / 2;
             r_center.y = r_center.y + (text_size.height) / 2;
             // add
-            putText(left_display, text, center, FONT_HERSHEY_SIMPLEX, 1, color, 2);
-            putText(left_display, text, center, FONT_HERSHEY_SIMPLEX, 1, color, 2);
+            putText(left_display, text, l_center, FONT_HERSHEY_SIMPLEX, 1, color, 2);
+            putText(left_display, text, r_center, FONT_HERSHEY_SIMPLEX, 1, color, 2);
         }
         // add
         cv::imshow(left_win, left_display);

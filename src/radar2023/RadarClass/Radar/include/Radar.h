@@ -66,7 +66,7 @@ private:
     std::shared_ptr<image_transport::ImageTransport> image_transport;
     ros::Subscriber sub_lidar;
     image_transport::Publisher GUI_left_image_pub_; // add
-    image_transport::Publisher GUI_left_image_pub_;
+    image_transport::Publisher GUI_right_image_pub_;
 
     ros::Publisher pub_locations;
 
