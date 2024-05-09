@@ -1,6 +1,9 @@
 #ifndef __RADAR_H
 #define __RADAR_H
 
+#define LEFT_CAMERA_IDX 0
+#define RIGHT_CAMERA_IDX 1
+
 #include "../../Common/include/public.h"
 #include "../../Camera/include/camera.h"
 #include "../../Camera/include/VideoRecorder.h"

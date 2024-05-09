@@ -425,8 +425,8 @@ void Radar::LidarCallBack(const sensor_msgs::PointCloud2::ConstPtr &msg)
 {
     pcl::PointCloud<pcl::PointXYZ>::Ptr pc(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromROSMsg(*msg, *pc);
-    std::vector<std::vector<float>> left_tempDepth = this->depthQueue->pushback(0, *pc); // change:pushback
-    std::vector<std::vector<float>> right_tempDepth = this->depthQueue->pushback(1, *pc);
+    std::vector<std::vector<float>> left_tempDepth = this->depthQueue->pushback(LEFT_CAMERA_IDX, *pc); // change:pushback
+    std::vector<std::vector<float>> right_tempDepth = this->depthQueue->pushback(RIGHT_CAMERA_IDX, *pc);
     unique_lock<shared_timed_mutex> ulk(this->myMutex_publicDepth);
     this->publicDepth[0].swap(left_tempDepth);
     this->publicDepth[1].swap(right_tempDepth);
@@ -454,8 +454,8 @@ void Radar::SerWriteLoop()
 void Radar::MainProcessLoop()
 {
     // TODO:可以在哪里把>_cap->Index_Camera_直接传给线程类，然后修改所有访问这个索引的地方
-    int left_idx = this->cameraThread->_cap->Index_Camera_[0];
-    int right_idx = this->cameraThread->_cap->Index_Camera_[1];
+    int left_idx = 0;
+    int right_idx = 1;
 
     while (this->__MainProcessLoop_working)
     {
@@ -761,8 +761,6 @@ void Radar::spin()
     }
     this->_if_record = VideoRecorderSiginal;
 
-    int left_idx = this->cameraThread->_cap->Index_Camera_[0];
-    int right_idx = this->cameraThread->_cap->Index_Camera_[1];
 
     // TODO:pnp标定
     if (!this->mapMapping->_is_pass())
@@ -779,8 +777,8 @@ void Radar::spin()
             // unique_lock 对象 ulk 锁住了 myMutex_cameraThread，从而确保在 try 块中的代码执行期间，只有一个线程可以访问由该互斥量保护的资源
 
             // Mat:不用显示&来修改
-            bool pick_left = this->myLocation->locate_pick(this->cameraThread, left_idx, this->ENEMY, rvec[left_idx], tvec[left_idx], this->K_0_Mat[left_idx], this->C_0_Mat[left_idx], this->E_0_Mat[left_idx]);
-            bool pick_right = this->myLocation->locate_pick(this->cameraThread, right_idx, this->ENEMY, rvec[right_idx], tvec[right_idx], this->K_0_Mat[right_idx], this->C_0_Mat[right_idx], this->E_0_Mat[right_idx]);
+            bool pick_left = this->myLocation->locate_pick(this->cameraThread, LEFT_CAMERA_IDX, this->ENEMY, rvec[LEFT_CAMERA_IDX], tvec[LEFT_CAMERA_IDX], this->K_0_Mat[LEFT_CAMERA_IDX], this->C_0_Mat[LEFT_CAMERA_IDX], this->E_0_Mat[LEFT_CAMERA_IDX]);
+            bool pick_right = this->myLocation->locate_pick(this->cameraThread, RIGHT_CAMERA_IDX, this->ENEMY, rvec[RIGHT_CAMERA_IDX], tvec[RIGHT_CAMERA_IDX], this->K_0_Mat[RIGHT_CAMERA_IDX], this->C_0_Mat[RIGHT_CAMERA_IDX], this->E_0_Mat[RIGHT_CAMERA_IDX]);
             if (!pick_left && !pick_left)
             {
                 std::cout << "PICK PNP POINTS FAILURE!" << endl; // debug
@@ -796,8 +794,8 @@ void Radar::spin()
             return;
         }
         // camera_position and Transform matrix
-        this->mapMapping->push_T(left_idx, rvec[left_idx], tvec[left_idx]);
-        this->mapMapping->push_T(right_idx, rvec[right_idx], tvec[right_idx]);
+        this->mapMapping->push_T(LEFT_CAMERA_IDX, rvec[LEFT_CAMERA_IDX], tvec[LEFT_CAMERA_IDX]);
+        this->mapMapping->push_T(RIGHT_CAMERA_IDX, rvec[RIGHT_CAMERA_IDX], tvec[RIGHT_CAMERA_IDX]);
         this->logger->info("Locate pick Done");
     }
 

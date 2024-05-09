@@ -21,7 +21,7 @@ public:
     ~VideoRecorder();
 
     bool init(int camera_index, const char *videoPath, int coder, Size size); // add index
-    void write(Mat src);
+    void write(int camera_index,Mat src);
     void close();
 };
 

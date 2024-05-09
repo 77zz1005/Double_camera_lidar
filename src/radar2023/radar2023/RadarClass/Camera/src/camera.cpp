@@ -189,7 +189,7 @@ void MV_Camera::setGain(int gain, int camera_index)
     CameraSetAnalogGain(this->hCamera[camera_index], gain);
 }
 // //
-void MV_Camera::saveParam(int camera_index, const char tCameraConfigPath)
+void MV_Camera::saveParam(int camera_index, const char* tCameraConfigPath)//const char *tCameraConfigPath
 {
     if (access(tCameraConfigPath, F_OK) == 0)
         return;
