@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9.0)
 SET(CMAKE_BUILD_TYPE "Release")
 project(radar2023 LANGUAGES CXX CUDA)
-set(OpenCV_DIR /user/local/opencv-4.6.0/build)
+set(OpenCV_DIR /home/wrs/Downloads/OpenCV4.6/opencv-4.6.0/build)
 find_package(OpenCV 4.6.0 REQUIRED)
 #add before find_package
 set(cv_bridge_DIR /home/wrs/RM_Radar2023/src/ThirdParty/cv_bridge/cmake)  
@@ -27,8 +27,8 @@ include_directories()
 add_compile_options(-std=c++17)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-z,stack-size=16000000")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -pthread -lpthread -O3  -Wall -fstack-protector-all")
-set(CUDA_GEN_CODE "-gencode=arch=compute_89,code=sm_89")
-# set(CUDA_GEN_CODE "-gencode=arch=compute_86,code=sm_86")
+# set(CUDA_GEN_CODE "-gencode=arch=compute_89,code=sm_89")
+set(CUDA_GEN_CODE "-gencode=arch=compute_86,code=sm_86")
 set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}  -std=c++17 -O3 -Xcompiler -fPIC -g -w ${CUDA_GEN_CODE}")
 
 add_message_files(
@@ -60,8 +60,8 @@ link_directories(/user/local/cuda-11.8/lib)
 # include_directories(/user/local/cuda/cudnn/v8.0.4/include) has been included in cuda-11.8/incude
 link_directories(/user/local/cuda-11.8/lib64)
 # Tensorrt
-include_directories(/home/lidar/TensorRT-8.5.2.2/include)
-link_directories(/home/lidar/TensorRT-8.5.2.2/lib)
+include_directories(/home/wrs/Downloads/TensorRT-8.5.3.1.Linux.x86_64-gnu.cuda-11.8.cudnn8.6/TensorRT-8.5.3.1/include)
+link_directories(//home/wrs/Downloads/TensorRT-8.5.3.1.Linux.x86_64-gnu.cuda-11.8.cudnn8.6/TensorRT-8.5.3.1/lib)
 # no mkl
 # include_directories(${MKLROOT}/include)
 # link_directories(${MKLROOT}/lib/intel64)

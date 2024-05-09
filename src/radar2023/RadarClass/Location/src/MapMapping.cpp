@@ -267,7 +267,7 @@ void MapMapping::mergeUpdata(vector<bboxAndRect> &left_pred, vector<bboxAndRect>
         {
             if (left_pred[i].armor.depth != 0 && !isnan(left_pred[i].armor.depth))
             {
-                pred[i].armor.flag = true;
+                left_pred[i].armor.flag = true;
                 left_locations.emplace_back(left_pred[i].armor);
             }
             else

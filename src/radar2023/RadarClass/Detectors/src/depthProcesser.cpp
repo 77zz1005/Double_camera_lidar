@@ -39,7 +39,7 @@ vector<vector<float>> DepthQueue::pushback(int camera_index, pcl::PointCloud<pcl
     Matrix<int, 2, MaxPointsNum> ipBox;
     pointsBox.leftCols(cols) << transformed_points;                                                                              // 完整数据
     dptBox.leftCols(cols) << transformed_points.row(2);                                                                          // 深度z
-    ipBox << ((this->K_0 * pointsBox).array().rowwise() * (pointsBox.row(2).array().inverse())).topRows(2).matrix().cast<int>(); // 像素坐标
+    ipBox << ((this->K_0[camera_index] * pointsBox).array().rowwise() * (pointsBox.row(2).array().inverse())).topRows(2).matrix().cast<int>(); // 像素坐标
     // CHECK:越界则将像素坐标x,y置0
     /*
     注：点云转为像素坐标 越界的会变为负数/大于相机分辨率 因此深度图与相机图像的原点是等价的

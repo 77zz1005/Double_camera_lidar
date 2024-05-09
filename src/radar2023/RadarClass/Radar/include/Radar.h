@@ -117,14 +117,14 @@ private:
     bool _if_record = false;
     bool is_alive = true;
 
-    vector<vector<vector<float>>> publicDepth(2);
+    vector<vector<vector<float>>> publicDepth=vector<vector<vector<float>>>(2);
     shared_timed_mutex myMutex_publicDepth;
     shared_timed_mutex myMutex_cameraThread;
     SharedQueue<Mat> myFrames;
 
-    vector<Mat> K_0_Mat(2);
-    vector<Mat> E_0_Mat(2);
-    vector<Mat> C_0_Mat(2);
+    vector<Mat> K_0_Mat=vector<Mat>(2);
+    vector<Mat> E_0_Mat=vector<Mat>(2);
+    vector<Mat> C_0_Mat=vector<Mat>(2);
 
     std::shared_ptr<spdlog::logger> logger = spdlog::get("RadarLogger");
 

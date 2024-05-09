@@ -9,7 +9,7 @@ VideoRecorder::~VideoRecorder()
     this->close();
 }
 
-bool VideoRecorder::init(int camera_index, char *videoPath, int coder, Size size)
+bool VideoRecorder::init(int camera_index, const char *videoPath, int coder, Size size)
 {
     if (access(videoPath, F_OK) == -1)
     {
@@ -49,6 +49,6 @@ void VideoRecorder::write(Mat src)
 
 void VideoRecorder::close()
 {
-    this->vw[0].release();    
+    this->vw[0].release();
     this->vw[1].release();
 }
