@@ -8,7 +8,7 @@
 #define lidarTopicName (char *)"/livox/lidar"
 
 /*---For Video Record---*/
-#define FRAME_DEPTH 100 // 图像队列深度，OOM时适当减少
+#define FRAME_DEPTH 50 // 图像队列深度，OOM时适当减少 100/2
 
 /*---For depth and common function---*/
 

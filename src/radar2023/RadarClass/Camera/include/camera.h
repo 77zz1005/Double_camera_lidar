@@ -19,10 +19,12 @@ class MV_Camera
 {
 public:
     typedef std::shared_ptr<MV_Camera> Ptr;
+    int Index_Camera_[2]; // TODO:后面可以根据输出确定左右 0/1
+    // 注：Radar函数需要访问
 
 private:
     int iCameraCounts = 0;
-    int iStatus=-1;//share 2
+    int iStatus = -1;                     // share 2
     tSdkCameraDevInfo tCameraEnumList[2]; // 枚举
     int hCamera[2] = {-1, -1};            // 存储两个相机的句柄
     tSdkCameraCapbility tCapability[2];
@@ -32,7 +34,6 @@ private:
     std::shared_ptr<spdlog::logger> logger = spdlog::get("RadarLogger");
     string CameraConfigPath[2]; // 路径
     string SerialNumber[2];     // TODO:用于存储相机序列号,通过硬件确定产品唯一序列号
-    int Index_Camera_[2];       // TODO:后面可以根据输出确定左右 0/1
 
 public:
     bool _openflag = false;
@@ -47,14 +48,14 @@ public:
 
     void uninit(); // share 2
 
-    void setExposureTime(int camera_index,int ex = 30); // add index
-    //C++
+    void setExposureTime(int camera_index, int ex = 30); // add index
+    // C++
     /*
     Err: void setExposureTime(int ex = 30, int camera_index)
     默认参数位置问题：在声明函数setExposureTime时，默认参数应该在非默认参数之后。例如，应该这样声明函数：
     void setExposureTime(int camera_index, int ex = 30); // add index
     */
-    void setGain(int gain, int camera_index);            // add index
+    void setGain(int camera_index, int gain); // add index
 
     void saveParam(int camera_index, const char tCameraConfigPath[23]); // add index
 

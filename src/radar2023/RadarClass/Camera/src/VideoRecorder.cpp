@@ -40,11 +40,11 @@ bool VideoRecorder::init(int camera_index, const char *videoPath, int coder, Siz
     return true;
 }
 
-void VideoRecorder::write(Mat src)
+void VideoRecorder::write(int camera_index, Mat src)
 {
-    if (!this->vw.isOpened())
+    if (!this->vw[camera_index].isOpened())
         return;
-    this->vw.write(src);
+    this->vw[camera_index].write(src);
 }
 
 void VideoRecorder::close()

@@ -175,7 +175,7 @@ void MV_Camera::uninit()
 }
 
 // changed
-void MV_Camera::setExposureTime(int camera_index,int ex)
+void MV_Camera::setExposureTime(int camera_index, int ex)
 {
     if (this->hCamera[camera_index] == -1)
         return;
@@ -189,7 +189,7 @@ void MV_Camera::setGain(int gain, int camera_index)
     CameraSetAnalogGain(this->hCamera[camera_index], gain);
 }
 // //
-void MV_Camera::saveParam(int camera_index, char *tCameraConfigPath)
+void MV_Camera::saveParam(int camera_index, const char tCameraConfigPath)
 {
     if (access(tCameraConfigPath, F_OK) == 0)
         return;
@@ -211,7 +211,7 @@ int MV_Camera::getExposureTime(int camera_index)
     if (this->hCamera[camera_index] == -1)
         return -1;
     double ex;
-    CameraGetExposureTime(this->hCamera_0, &ex);
+    CameraGetExposureTime(this->hCamera[camera_index], &ex);
     return int(ex);
 }
 
@@ -300,10 +300,10 @@ void CameraThread::openCamera(bool is_init)
             int key = waitKey(0);                                          // 等待键盘输入
             destroyWindow("LEFT_CAMERA_PREVIEW");                          // 销毁窗口
 
-            this->_cap->disableAutoEx(left_index);                                // 禁用左相机的自动曝光功能
-            if (key == 84 || key == 116)                                          // 键盘t/T
-                this->_cap->adjustExposure(left_index);                           // 调整左相机曝光参数
-            this->_cap->saveParam(left_index, this->CameraConfigPath[0].c_str()); // 保存左相机参数路径
+            this->_cap->disableAutoEx(left_index);                               // 禁用左相机的自动曝光功能
+            if (key == 84 || key == 116)                                         // 键盘t/T
+                this->adjustExposure(left_index);                                // 调整左相机曝光参数
+            this->_cap->saveParam(left_index, this->CameraConfigPath_0.c_str()); // 保存左相机参数路径
 
             // TODO:先假设1为右相机
             namedWindow("RIGHT_CAMERA_PREVIEW", WINDOW_NORMAL);
@@ -311,12 +311,12 @@ void CameraThread::openCamera(bool is_init)
             setWindowProperty("RIGHT_CAMERA_PREVIEW", WND_PROP_TOPMOST, 1); // 置顶
             moveWindow("RIGHT_CAMERA_PREVIEW", 1000, 100);                  // 移动窗口到指定位置，水平位置不同
             imshow("RIGHT_CAMERA_PREVIEW", framebag_1.frame);
-            int key = waitKey(0);
+            int r_key = waitKey(0);
             destroyWindow("RIGHT_CAMERA_PREVIEW");
-            this->_cap[1]->disableAutoEx(right_index);                             // 关闭右相机自动曝光
-            if (key == 121 || key == 89)                                           // 如果按下 y/Y 键
-                this->_cap->adjustExposure(right_index);                           // 调整右相机曝光
-            this->_cap->saveParam(right_index, this->CameraConfigPath[1].c_str()); // 保存右相机参数路径
+            this->_cap->disableAutoEx(right_index);                               // 关闭右相机自动曝光
+            if (r_key == 121 || r_key == 89)                                      // 如果按下 y/Y 键
+                this->adjustExposure(right_index);                                // 调整右相机曝光
+            this->_cap->saveParam(right_index, this->CameraConfigPath_1.c_str()); // 保存右相机参数路径
         }
 
         initFlag = true;
@@ -355,8 +355,8 @@ void CameraThread::adjustExposure(int camera_index)
     while (framebag.flag && waitKey(1) != 81 && waitKey(1) != 113 && getTrackbarPos("Quit", window_name) == 0)
     {
         // 获取滑动条value 并设置相机的曝光时间和增益
-        this->_cap->setExposureTime(getTrackbarPos("ex", window_name),camera_index);
-        this->_cap->setGain(getTrackbarPos("gain", window_name));
+        this->_cap->setExposureTime(camera_index, getTrackbarPos("ex", window_name));
+        this->_cap->setGain(camera_index, getTrackbarPos("gain", window_name));
 
         // 显示图像
         imshow(window_name, framebag.frame);

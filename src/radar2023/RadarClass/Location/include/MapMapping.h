@@ -15,18 +15,19 @@ public:
     typedef std::shared_ptr<MapMapping> Ptr;
 
     //<第二层网络分类cls,重新映射的id>
+    //[B1 B2 B3 B4 B5 B7 R1 R2 R3 R4 R5 R7]
     map<int, int> _ids = {{0, 6}, {1, 7}, {2, 8}, {3, 9}, {4, 10}, {5, 11}, {6, 0}, {7, 1}, {8, 2}, {9, 3}, {10, 4}, {11, 5}};
 
 private:
     vector<MapLocation3D> _location3D;
     vector<MapLocation3D> cached_location3D;
 
-    vector<Matrix<float, 4, 4>> _T=vector<Matrix<float, 4, 4>>(2);            // world2camera
-    vector<Matrix<float, 4, 4>> T=vector<Matrix<float, 4, 4>>(2);             // camera2world
-    vector<Matrix<float, 3, 1>> cameraPostion=vector<Matrix<float, 3, 1>>(2); // 相机位置
+    vector<Matrix<float, 4, 4>> _T = vector<Matrix<float, 4, 4>>(2);            // world2camera
+    vector<Matrix<float, 4, 4>> T = vector<Matrix<float, 4, 4>>(2);             // camera2world
+    vector<Matrix<float, 3, 1>> cameraPostion = vector<Matrix<float, 3, 1>>(2); // 相机位置
     // changed
-    vector<Mat> rvec=vector<Mat>(2);
-    vector<Mat> tvec=vector<Mat> (2);
+    vector<Mat> rvec = vector<Mat>(2);
+    vector<Mat> tvec = vector<Mat>(2);
     bool _pass_flag = false;
 
     int _location_pred_time[12] = {0};
@@ -38,7 +39,7 @@ private:
     std::shared_ptr<spdlog::logger> logger = spdlog::get("RadarLogger");
 
 private:
-    void adjust_z_one(MapLocation3D &locs);
+    void adjust_z_one(int camera_index, MapLocation3D &locs);
     void _location_prediction();
 
 public:

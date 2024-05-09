@@ -340,7 +340,7 @@ void MapMapping::mergeUpdata(vector<bboxAndRect> &left_pred, vector<bboxAndRect>
     // 参照上交 以右相机为基准做逻辑合并，而非取overlap的均值
     // TODO
 
-    if (locations.size() > 0)
+    if (right_locations.size() > 0 || left_locations.size() > 0)
     {
         vector<MapLocation3D> pred_loc;
         vector<MapLocation3D> cache_pred;
@@ -374,7 +374,7 @@ void MapMapping::mergeUpdata(vector<bboxAndRect> &left_pred, vector<bboxAndRect>
                     al.flag = true;
 
                     if (Z_A)
-                        this->adjust_z_one(al); // 处理z突变
+                        this->adjust_z_one(1, al); // 处理z突变
                     break;
                 }
             }
@@ -400,7 +400,7 @@ void MapMapping::mergeUpdata(vector<bboxAndRect> &left_pred, vector<bboxAndRect>
                         al.flag = true;
 
                         if (Z_A)
-                            this->adjust_z_one(al); // 处理z突变
+                            this->adjust_z_one(0, al); // 处理z突变
                         break;
                     }
                 }
@@ -452,7 +452,7 @@ void MapMapping::mergeUpdata(vector<bboxAndRect> &left_pred, vector<bboxAndRect>
         this->_location_prediction();
 }
 // TODO: 待验证-深度突变
-void MapMapping::adjust_z_one(MapLocation3D &loc)
+void MapMapping::adjust_z_one(int camera_index, MapLocation3D &loc)
 {
     MapLocation3D pre_loc;
     for (const auto &it : this->cached_location3D)
@@ -465,10 +465,10 @@ void MapMapping::adjust_z_one(MapLocation3D &loc)
     if (loc.z - pre_loc.z > Z_THRE)
     {
         Matrix<float, 3, 1> line;
-        line << loc.x - this->cameraPostion(0, 0), loc.y - this->cameraPostion(1, 0), loc.z - this->cameraPostion(2, 0);
-        float ratio = (pre_loc.z - this->cameraPostion(2, 0)) / line(2, 0);
-        loc.x = ratio * line(0, 0) + this->cameraPostion(0, 0);
-        loc.y = ratio * line(1, 0) + this->cameraPostion(1, 0);
-        loc.z = ratio * line(2, 0) + this->cameraPostion(2, 0);
+        line << loc.x - (this->cameraPostion[camera_index])(0, 0), loc.y - (this->cameraPostion[camera_index])(1, 0), loc.z - (this->cameraPostion[camera_index])(2, 0);
+        float ratio = (pre_loc.z - (this->cameraPostion)[camera_index](2, 0)) / line(2, 0);
+        loc.x = ratio * line(0, 0) + (this->cameraPostion)[camera_index](0, 0);
+        loc.y = ratio * line(1, 0) + (this->cameraPostion[camera_index])(1, 0);
+        loc.z = ratio * line(2, 0) + (this->cameraPostion[camera_index])(2, 0);
     }
 }

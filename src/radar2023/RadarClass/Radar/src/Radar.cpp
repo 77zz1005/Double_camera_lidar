@@ -137,7 +137,9 @@ void Radar::drawArmorsForDebug(vector<bboxAndRect> &armors, Mat &img)
 
 Radar::Radar()
 {
-    this->myFrames.setDepth(FRAME_DEPTH);
+    // add
+    this->myFrames[0].setDepth(FRAME_DEPTH);
+    this->myFrames[1].setDepth(FRAME_DEPTH);
 }
 
 Radar::~Radar()
@@ -294,8 +296,8 @@ void Radar::init()
     }
 #endif
     vector<Matrix<float, 3, 3>> K_0(2);
-    vector<Matrix<float, 3, 3>> C_0(2);
-    vector<Matrix<float, 3, 3>> E_0(2);
+    vector<Matrix<float, 1, 5>> C_0(2);
+    vector<Matrix<float, 4, 4>> E_0(2);
     if (!read_param(this->K_0_Mat[0], this->C_0_Mat[0], this->E_0_Mat[0], this->share_path + "/params/" + this->CAMERA_PARAM_0))
     {
         this->logger->error("Can't read CAMERA_PARAM_0: {}!", this->share_path + "/params/" + this->CAMERA_PARAM_0);
@@ -475,8 +477,8 @@ void Radar::MainProcessLoop()
                 // TODO：修改所有录制相关。这里先改成2次调用
                 Mat left_record_frame = frameBag_0.frame.clone();
                 Mat right_record_frame = frameBag_1.frame.clone();
-                this->myFrames.push(left_record_frame);
-                this->myFrames.push(right_record_frame);
+                this->myFrames[left_idx].push(left_record_frame);
+                this->myFrames[right_idx].push(right_record_frame);
             }
 
 // changed: 先只考虑修改双神经网络的代码
@@ -554,7 +556,7 @@ void Radar::MainProcessLoop()
                 }
                 shared_lock<shared_timed_mutex> slk_pd(this->myMutex_publicDepth); // 上锁
                 // 获取深度
-                if ((this->left_publicDepth.size() == 0) && (this->right_publicDepth.size() == 0))
+                if ((this->publicDepth[left_idx].size() == 0) && (this->publicDepth[right_idx].size() == 0))
                 {
                     slk_pd.unlock();
                     this->logger->info("No Lidar Msg , Return");
@@ -581,7 +583,7 @@ void Radar::MainProcessLoop()
 
                     // changed
                     // this->mapMapping->mergeUpdata(pred, IouArmors, this->K_0_Mat, this->C_0_Mat);
-                    this->mapMapping->mergeUpdata(left_pred, right_IouArmors, left_IouArmors, right_IouArmors, this->K_0_Mat, this->C_0_Mat);
+                    this->mapMapping->mergeUpdata(left_pred, right_pred, left_IouArmors, right_IouArmors, this->K_0_Mat, this->C_0_Mat);
                     /*由this->_location3D[this->_ids[(int)pred_loc[i].id]] = pred_loc[i];
                     可以得到按某种顺序排列的3d坐标（正y）
                     */
@@ -679,10 +681,13 @@ void Radar::VideoRecorderLoop()
 {
     while (this->__VideoRecorderLoop_working)
     {
-        if (this->_if_record && this->myFrames.size() > 0 && !this->_recorder_block)
+        if (this->_if_record && this->myFrames[0].size() > 0 && this->myFrames[1].size() > 0 && !this->_recorder_block)
         {
-            this->videoRecorder->write(this->myFrames.front());
-            this->myFrames.pop();
+            this->videoRecorder->write(0, this->myFrames[0].front());
+            this->videoRecorder->write(1, this->myFrames[1].front());
+
+            this->myFrames[0].pop();
+            this->myFrames[1].pop();
         }
         else if (!this->_if_record)
         {
@@ -832,9 +837,10 @@ void Radar::spin()
         this->serWrite = thread(std::bind(&Radar::SerWriteLoop, this));
         this->logger->info("SerThread initing ...Done");
     }
-    if (myFrames.size() > 0 && this->is_alive && !this->_if_record)
+    if ((myFrames[0].size() > 0) || (myFrames[1].size() > 0) && this->is_alive && !this->_if_record)
     {
-        myFrames.pop(); // TODO
+        myFrames[0].pop(); // TODO
+        myFrames[1].pop();
         // C++
         // 队列（例如myFrames）是先进先出（FIFO）的数据结构，因此从队列中弹出的元素是最早进入队列的元素，也就是队列的前面元素
     }

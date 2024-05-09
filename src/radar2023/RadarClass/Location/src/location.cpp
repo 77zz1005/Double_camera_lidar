@@ -160,7 +160,7 @@ bool Location::locate_pick(CameraThread::Ptr cap, int camera_index, int enemy, M
     cv::destroyWindow("ZOOM_WINDOW");
     if (!solvePnP(ops, pick_points, K_0, C_0, rvec_Mat, tvec_Mat, false, SolvePnPMethod::SOLVEPNP_P3P))
     {
-        std::cout << window_name + "Solve PnP failed" << end;
+        std::cout << window_name + "Solve PnP failed" << endl;
         this->logger->error("Solve PnP failed");
         return false;
     }
