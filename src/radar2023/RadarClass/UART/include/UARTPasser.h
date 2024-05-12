@@ -32,9 +32,9 @@ public:
     float _event_prevent[6] = {0.f};
     int loop_send = 0;
 
-    // TO TEST
+#ifdef Referee_sys_Test
     vector<vector<float>> _test_robot_location = vector<vector<float>>{{0.0f, 0.0f}, {25.0 / 5.0, -18.0 / 5.0}, {25.0 / 5.0 * 2.0, -18.0 / 5.0 * 2.0}, {25.0 / 5.0 * 3.0, -18.0 / 5.0 * 3.0}, {25.0 / 5.0 * 4.0, -18.0 / 5.0 * 4.0}, {25.0, -18.0}};
-
+#endif
     // add: radar
     // 双倍易伤
     int _Injury_Num = 0;              // 雷达是否有易伤的机会 开局为0,至多为2

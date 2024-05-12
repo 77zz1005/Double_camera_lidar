@@ -48,7 +48,7 @@ public:
 
     bool _is_pass();
     void push_T(int camrea_index, Mat &rvec, Mat &tvec); // add index
-    void _plot_region_rect(int camera_index, vector<vector<Point3f>> &points, Mat &frame, Mat &K_0, Mat &C_0);
+    void _plot_region_rect(int camera_index,vector<vector<Point3f>> &points, Mat &frame, Mat &K_0, Mat &C_0);
     vector<ArmorBoundingBox> _IoU_prediction(vector<bboxAndRect> pred, vector<DetectBox> sepboxs);
 #if defined UseDeepSort && !(defined UsePointCloudSepTarget)
     void _DeepSort_prediction(vector<bboxAndRect> &pred, vector<DetectBox> sepboxs);

@@ -109,10 +109,9 @@ void Radar::drawBbox(vector<DetectBox> &bboxs, Mat &img)
 {
     for (DetectBox &it : bboxs)
     {
-        std::cout << "111111" << endl;
         cv::rectangle(img, Rect(it.x1, it.y1, it.x2 - it.x1, it.y2 - it.y1), Scalar(0, 255, 0), 2);
     }
-    std::cout << "drawBbox end" << endl;
+   
 }
 
 void Radar::drawArmorsForDebug(vector<ArmorBoundingBox> &armors, Mat &img)
@@ -135,7 +134,6 @@ void Radar::drawArmorsForDebug(vector<bboxAndRect> &armors, Mat &img)
         cv::rectangle(img, temp, Scalar(0, 255, 0), 2);
         cv::putText(img, to_string(int(it.armor.cls)), cv::Point2i(temp.x, temp.y), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 255), 3);
     }
-    std::cout << "drawArmorsForDebug" << endl;
 }
 
 Radar::Radar()
@@ -382,7 +380,7 @@ void Radar::init()
     this->_recorder_block = (!this->videoRecorder->init(0, (this->share_path + "/Record/" + "Left/").c_str(), VideoWriter::fourcc('m', 'p', '4', 'v'), Size(ImageW, ImageH))) && (!this->videoRecorder->init(1, (this->share_path + "/Record/" + "Right/").c_str(), VideoWriter::fourcc('m', 'p', '4', 'v'), Size(ImageW, ImageH)));
     // std::cout<<"视频录制器初始化成功"<<endl;
     this->cameraThread->start(); // changed: Double camera
-    std::cout << "相机线程开启成功" << endl;
+    std::cout<<"相机线程开启成功"<<endl;
     this->_init_flag = true;
     this->logger->info("Init Done");
     this->is_alive = true;
@@ -458,11 +456,11 @@ void Radar::SerWriteLoop()
 void Radar::MainProcessLoop()
 {
     // TODO:可以在哪里把>_cap->Index_Camera_直接传给线程类，然后修改所有访问这个索引的地方
-    std::cout << "主处理程序开启……" << endl;
+    std::cout<<"主处理程序开启……"<<endl;
     while (this->__MainProcessLoop_working)
     {
         auto start_t = std::chrono::system_clock::now().time_since_epoch(); // start time
-        std::cout << "主处理程序循环……" << endl;
+        std::cout<<"主处理程序循环……"<<endl;
 
         // CHECK：若发生错误关闭，尝试再次通过相机线程开启抓图
         if (!this->cameraThread->is_open())
@@ -498,34 +496,28 @@ void Radar::MainProcessLoop()
 #else
             vector<DetectBox> left_sepTargets = this->carDetector->infer(frameBag_0.frame);  // 兵种yolov5
             vector<DetectBox> right_sepTargets = this->carDetector->infer(frameBag_1.frame); // 兵种yolov5
-            this->drawBbox(left_sepTargets, frameBag_0.frame);
-            this->drawBbox(right_sepTargets, frameBag_1.frame);
 
 #if defined UseDeepSort && !(defined UsePointCloudSepTarget)
             this->dsTracker->sort(frameBag.frame, sepTargets);
 #endif
             vector<bboxAndRect> left_pred = this->armorDetector->infer(frameBag_0.frame, left_sepTargets);   // 装甲板yolov5
             vector<bboxAndRect> right_pred = this->armorDetector->infer(frameBag_1.frame, right_sepTargets); // 装甲板yolov5
-            this->drawArmorsForDebug(left_pred, frameBag_0.frame);
-            this->drawArmorsForDebug(right_pred, frameBag_1.frame);
 
 #endif
 #else
             vector<bboxAndRect> pred = this->armorDetector->infer(frameBag.frame);
 #endif
-            // 正式比赛时可关闭：from config.h
-            // TODO:显示2幅frame
-            std::cout << "完成推理" << endl;
+// 正式比赛时可关闭：from config.h
+// TODO:显示2幅frame
 #if defined Test && defined TestWithVis
 #ifndef UseOneLayerInfer
-            // this->drawBbox(left_sepTargets, frameBag_0.frame);
-            // this->drawBbox(right_sepTargets, frameBag_1.frame);
-            std::cout << "车辆框……" << endl;
+            this->drawBbox(left_sepTargets, frameBag_0.frame);
+            this->drawBbox(right_sepTargets, frameBag_1.frame);
+
 
 #endif
-            // this->drawArmorsForDebug(left_pred, frameBag_0.frame);
-            // this->drawArmorsForDebug(right_pred, frameBag_1.frame);
-            std::cout << "装甲板框……" << endl;
+            this->drawArmorsForDebug(left_pred, frameBag_0.frame);
+            this->drawArmorsForDebug(right_pred, frameBag_1.frame);
 #endif
 #ifdef ExperimentalOutput
             int pred_size = pred.size();
@@ -557,12 +549,12 @@ void Radar::MainProcessLoop()
             }
 #endif
 #endif
-            if (left_pred.size() != 0 || right_pred.size() != 0)
+            if (left_pred.size() != 0|| right_pred.size() != 0)
             {
-                std::cout << "过滤装甲板……" << endl;
-                this->armor_filter(left_pred);
-                this->armor_filter(right_pred);
-                std::cout << "***完成***" << endl;
+                if(left_pred.size() != 0){
+                    this->armor_filter(left_pred);}
+                if(right_pred.size() != 0){
+                    this->armor_filter(right_pred);}
 
                 shared_lock<shared_timed_mutex> slk_pd(this->myMutex_publicDepth); // 上锁
                 // 获取深度
@@ -573,7 +565,6 @@ void Radar::MainProcessLoop()
                 }
                 else
                 {
-                    std::cout << "获取深度……" << endl;
 
                     this->detectDepth(LEFT_CAMERA_IDX, left_pred);
                     this->detectDepth(RIGHT_CAMERA_IDX, right_pred);
@@ -599,7 +590,6 @@ void Radar::MainProcessLoop()
                     /*由this->_location3D[this->_ids[(int)pred_loc[i].id]] = pred_loc[i];
                     可以得到按某种顺序排列的3d坐标（正y）
                     */
-                    std::cout << "获取深度完成" << endl;
                     judge_message myJudge_message;
                     myJudge_message.task = 1; // TODO:不同任务
                     myJudge_message.loc = this->mapMapping->getloc();
@@ -624,7 +614,6 @@ void Radar::MainProcessLoop()
                 }
             }
             auto end_t = std::chrono::system_clock::now().time_since_epoch();
-            std::cout << "计时结束" << endl;
 #ifdef Test
             char ch[255];
             sprintf(ch, "FPS %d", int(std::chrono::nanoseconds(1000000000).count() / (end_t - start_t).count()));
@@ -632,12 +621,11 @@ void Radar::MainProcessLoop()
             // add
             cv::putText(frameBag_0.frame, fps_str, {10, 50}, cv::FONT_HERSHEY_SIMPLEX, 2, {0, 255, 0}, 3);
             cv::putText(frameBag_1.frame, fps_str, {10, 50}, cv::FONT_HERSHEY_SIMPLEX, 2, {0, 255, 0}, 3);
-            std::cout << "添加文本信息" << endl;
 
             // TODO:GUI-这是什么？
-            this->mapMapping->_plot_region_rect(LEFT_CAMERA_IDX, this->show_region, frameBag_0.frame, this->K_0_Mat[0], this->C_0_Mat[0]);  // left
-            this->mapMapping->_plot_region_rect(RIGHT_CAMERA_IDX, this->show_region, frameBag_1.frame, this->K_0_Mat[1], this->C_0_Mat[1]); // right
-            std::cout << "_plot_region_rect" << endl;
+            // this->mapMapping->_plot_region_rect(LEFT_CAMERA_IDX,this->show_region, frameBag_0.frame, this->K_0_Mat[0], this->C_0_Mat[0]); // left
+            // this->mapMapping->_plot_region_rect(RIGHT_CAMERA_IDX,this->show_region, frameBag_1.frame, this->K_0_Mat[1], this->C_0_Mat[1]); // right
+
 
 #endif
             // changed: 2 Publisher
@@ -645,22 +633,20 @@ void Radar::MainProcessLoop()
             try
             {
                 left_image_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frameBag_0.frame).toImageMsg();
-                std::cout << "GUI消息发送成功" << endl;
-
+                
                 left_image_msg->header.frame_id = "radar2023";
                 left_image_msg->header.stamp = ros::Time::now();
                 left_image_msg->header.seq = 1;
                 this->GUI_left_image_pub_.publish(left_image_msg);
-                std::cout << "GUI消息发送成功" << endl;
             }
             catch (cv_bridge::Exception &e)
             {
-                std::cout << "cv_bridge mistake" << endl;
+                 std::cout<<"cv_bridge mistake"<<endl;
                 this->logger->error("cv_bridge exception: %s", e.what());
                 this->logger->flush();
                 continue;
             }
-            this->logger->flush();
+            // this->logger->flush();
             // add
             sensor_msgs::ImagePtr right_image_msg;
             try
@@ -779,6 +765,7 @@ void Radar::spin()
     }
     this->_if_record = VideoRecorderSiginal;
 
+
     // TODO:pnp标定
     if (!this->mapMapping->_is_pass())
     {
@@ -792,17 +779,19 @@ void Radar::spin()
         {
             // 互斥锁
             // unique_lock 对象 ulk 锁住了 myMutex_cameraThread，从而确保在 try 块中的代码执行期间，只有一个线程可以访问由该互斥量保护的资源
-            std::cout << "start 1st picking" << endl;
+            std::cout<<"start 1st picking"<<endl;
             // Mat:不用显示&来修改
             bool pick_left = this->myLocation->locate_pick(this->cameraThread, LEFT_CAMERA_IDX, this->ENEMY, rvec[LEFT_CAMERA_IDX], tvec[LEFT_CAMERA_IDX], this->K_0_Mat[LEFT_CAMERA_IDX], this->C_0_Mat[LEFT_CAMERA_IDX], this->E_0_Mat[LEFT_CAMERA_IDX]);
-            if (pick_left == 1)
+            if(pick_left==1)
             {
-                std::cout << "finish left picking" << endl;
+                std::cout<<"finish left picking"<<endl;
+
             }
             bool pick_right = this->myLocation->locate_pick(this->cameraThread, RIGHT_CAMERA_IDX, this->ENEMY, rvec[RIGHT_CAMERA_IDX], tvec[RIGHT_CAMERA_IDX], this->K_0_Mat[RIGHT_CAMERA_IDX], this->C_0_Mat[RIGHT_CAMERA_IDX], this->E_0_Mat[RIGHT_CAMERA_IDX]);
-            if (pick_right == 1)
+                        if(pick_right==1)
             {
-                std::cout << "finish right picking" << endl;
+                std::cout<<"finish right picking"<<endl;
+
             }
 
             if (!pick_left && !pick_left)

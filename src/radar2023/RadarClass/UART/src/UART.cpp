@@ -188,42 +188,43 @@ void UART::Referee_Transmit_Map(unsigned int cmdID, int targetId, float x, float
     ser->mswrite(buffer_tmp_array, 14 + 9); // 发送给串口
 }
 
-// // Origin
-// //  裁判系统评估--主
-// void UART::Robot_Data_Transmit_Map(MySerial::Ptr ser)
-// {
-//     /**格式转换**/
-//     bool flag;
-//     vector<float> location = myUARTPasser.get_position()[this->ind]; // 返回特定机器人的位置(x y)
-//     if (location[0] == 0 && location[1] == 0)                        // （x y）== (0,0)  false
-//         flag = false;
-//     else
-//         flag = true;
-//     /**将消息通过串口发给裁判系统**/
-//     if (!this->ENEMY && flag) // enemy red
-//     {
-//         //  cmd_id:0x0305 雷达-所有己方选手端发送enemy的坐标数据-显示到己方选手端的小地图上
-//         this->Referee_Transmit_Map(0x0305, this->Id_red, _Float32(location[0]), _Float32(location[1]), ser);
-//     }
-//     else if (flag) // enemy blue
-//     {
-//         this->Referee_Transmit_Map(0x0305, this->Id_blue, _Float32(location[0]), _Float32(location[1]), ser);
-//     }
+//  裁判系统评估--主
+void UART::Robot_Data_Transmit_Map(MySerial::Ptr ser)
+{
+    /**格式转换**/
+    bool flag;
+    vector<float> location = myUARTPasser.get_position()[this->ind]; // 返回特定机器人的位置(x y)
+    if (location[0] == 0 && location[1] == 0)                        // （x y）== (0,0)  false
+        flag = false;
+    else
+        flag = true;
+    /**将消息通过串口发给裁判系统**/
+    if (!this->ENEMY && flag) // enemy red
+    {
+        //  cmd_id:0x0305 雷达-所有己方选手端发送enemy的坐标数据-显示到己方选手端的小地图上
+        this->Referee_Transmit_Map(0x0305, this->Id_red, _Float32(location[0]), _Float32(location[1]), ser);
+    }
+    else if (flag) // enemy blue
+    {
+        this->Referee_Transmit_Map(0x0305, this->Id_blue, _Float32(location[0]), _Float32(location[1]), ser);
+    }
 
-//     /**更新**/
-//     if (flag)
-//         ++this->myUARTPasser.loop_send; //  更新计数器
-//     if (this->ind == 5)
-//     {
-//         // if (this->myUARTPasser.loop_send == 0)
-//         if (this->myUARTPasser.loop_send != 0)
-//             this->myUARTPasser.loop_send = 0; // 发送完所有敌方坐标 置0
-//     }
-//     this->ControlLoop_red();
-//     this->ControlLoop_blue();
-//     this->ind = (this->ind + 1) % 6;
-// }
-// 裁判系统评估--主
+    /**更新**/
+    if (flag)
+        ++this->myUARTPasser.loop_send; //  更新计数器
+    if (this->ind == 5)
+    {
+        // if (this->myUARTPasser.loop_send == 0)
+        if (this->myUARTPasser.loop_send != 0)
+            this->myUARTPasser.loop_send = 0; // 发送完所有敌方坐标 置0
+    }
+    this->ControlLoop_red();
+    this->ControlLoop_blue();
+    this->ind = (this->ind + 1) % 6;
+}
+
+//用于测试裁判系统
+#ifdef Referee_sys_Test
 void UART::Robot_Data_Transmit_Map(MySerial::Ptr ser)
 {
     /**格式转换**/
@@ -252,7 +253,7 @@ void UART::Robot_Data_Transmit_Map(MySerial::Ptr ser)
     this->ControlLoop_blue();
     this->ind = (this->ind + 1) % 6;
 }
-
+#endif
 void UART::ControlLoop_red() // 更新官方手册里的真实id
 {
     if (this->Id_red == 5)

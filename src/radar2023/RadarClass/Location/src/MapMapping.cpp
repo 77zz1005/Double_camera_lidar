@@ -54,13 +54,15 @@ void MapMapping::_location_prediction()
     this->_location_cache[1] = this->_location3D;
 }
 
-void MapMapping::_plot_region_rect(int camera_index, vector<vector<Point3f>> &points, Mat &frame, Mat &K_0, Mat &C_0)
+void MapMapping::_plot_region_rect(int camera_index,vector<vector<Point3f>> &points, Mat &frame, Mat &K_0, Mat &C_0)
 {
+    std::cout<<"准备绘制……"<<endl;
     for (auto &it : points)
     {
+        std::cout<<"进入循环……"<<endl;
         vector<Point2f> ips_pre;
         vector<Point2i> ips_dst;
-        cv::projectPoints(it, this->rvec[camera_index], this->tvec[], K_0, C_0, ips_pre);
+        cv::projectPoints(it, this->rvec[camera_index], this->tvec[camera_index], K_0, C_0, ips_pre);
         circle(frame, ips_pre[0], 5, Scalar(0, 255, 0), 2);
         circle(frame, ips_pre[1], 5, Scalar(0, 255, 255), 2);
         circle(frame, ips_pre[2], 5, Scalar(255, 255, 0), 2);
@@ -70,7 +72,6 @@ void MapMapping::_plot_region_rect(int camera_index, vector<vector<Point3f>> &po
         line(frame, ips_pre[2], ips_pre[3], Scalar(0, 255, 0), 3);
         line(frame, ips_pre[3], ips_pre[0], Scalar(0, 255, 0), 3);
     }
-    std::cout << "绘制完成" << endl;
 }
 
 vector<ArmorBoundingBox> MapMapping::_IoU_prediction(vector<bboxAndRect> pred, vector<DetectBox> sepboxs)

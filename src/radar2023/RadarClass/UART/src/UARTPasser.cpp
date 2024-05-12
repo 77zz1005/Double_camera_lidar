@@ -149,8 +149,9 @@ void UARTPasser::Receive_Robot_Data(unsigned char *buffer)
         this->logger->debug("Receive_Robot_Data");
 }
 
-// TEST
+#ifdef Referee_sys_Test
 vector<vector<float>> UARTPasser::test_get_position()
 {
     return this->_test_robot_location;
 }
+#endif

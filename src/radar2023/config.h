@@ -1,8 +1,9 @@
 /*---Debug---*/
 #define Test        // 测试标志
-// #define TestWithVis // 显示可视化检测结果
+#define TestWithVis // 显示可视化检测结果
 // #define UsingVideo  // 是否使用视频(！！！可能造成OOM, 请注意设置FRAME_DEPTH)
 // #define ShowDepth // 是否在GUI覆盖深度图
+// #define Referee_sys_Test
 
 /*---Common settings---*/
 #define lidarTopicName (char *)"/livox/lidar"

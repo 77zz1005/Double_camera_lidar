@@ -57,7 +57,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "gui_node");
     ros::NodeHandle nh;
     std::string share_path = ros::package::getPath("radar2023");
-    std::cout<<"GUI节点初始化"<<endl;
+    std::cout<<"*******************GUI节点初始化*******************"<<endl;
     ros::Subscriber msg_sub = nh.subscribe("/radar2023/locations", 1, locations_msgCallback);
     image_transport::ImageTransport it_(nh);
 
@@ -65,8 +65,8 @@ int main(int argc, char **argv)
     image_transport::Subscriber left_image_sub_;
     left_image_sub_ = it_.subscribe("/radar2023/left_result_view", 1, left_image_msgCallback);
     image_transport::Subscriber right_image_sub_;
-    left_image_sub_ = it_.subscribe("/radar2023/right_result_view", 1, right_image_msgCallback); // TODO
-    std::cout<<"接受消息成功"<<endl;
+    right_image_sub_ = it_.subscribe("/radar2023/right_result_view", 1, right_image_msgCallback); // TODO
+    std::cout<<"订阅消息成功"<<endl;
     // TODO:怎样在一个界面中设置双相机的视图?
     /***程序标完pnp,开始识别时的界面GUI***/
     // 设置滑动条
