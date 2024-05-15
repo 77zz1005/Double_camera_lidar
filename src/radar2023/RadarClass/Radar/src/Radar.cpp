@@ -357,7 +357,6 @@ void Radar::init()
 
     // TODO:GUI
     this->nh->setParam("/radar2023/ExitProgram", false);
-    // this->nh->setParam("/radar2023/Recorder", true);
     this->nh->setParam("/radar2023/Recorder", true);
 
     // Lidar
