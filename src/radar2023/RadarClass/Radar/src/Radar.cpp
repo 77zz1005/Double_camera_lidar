@@ -99,6 +99,29 @@ void Radar::send_judge(judge_message &message)
         }
         this->myUART->myUARTPasser.push_loc(loc);
         break;
+    case 2:
+        for (int i = 0; i < int(message.loc.size() / 2); ++i)
+        {
+            vector<float> temp_location;
+            temp_location.emplace_back(message.loc[i + this->ENEMY * 6].x);
+            temp_location.emplace_back(message.loc[i + this->ENEMY * 6].y);
+            loc.emplace_back(temp_location);
+        }
+        if (!loc[1].flag) // 如果没有识别到工程 定点发送工程坐标
+        {
+            if (this->ENEMY) // ENEMY blue
+            {
+                loc[1].x = BLUE_ENGINEER_X;
+                loc[1].y = BLUE_ENGINEER_Y;
+            }
+            else // ENEMY red
+            {
+                loc[1].x = RED_ENGINEER_X;
+                loc[1].y = RED_ENGINEER_Y;
+            }
+        }
+        this->myUART->myUARTPasser.push_loc(loc);
+        break;
 
     default:
         break;
@@ -111,7 +134,6 @@ void Radar::drawBbox(vector<DetectBox> &bboxs, Mat &img)
     {
         cv::rectangle(img, Rect(it.x1, it.y1, it.x2 - it.x1, it.y2 - it.y1), Scalar(0, 255, 0), 2);
     }
-   
 }
 
 void Radar::drawArmorsForDebug(vector<ArmorBoundingBox> &armors, Mat &img)
@@ -380,7 +402,7 @@ void Radar::init()
     this->_recorder_block = (!this->videoRecorder->init(0, (this->share_path + "/Record/" + "Left/").c_str(), VideoWriter::fourcc('m', 'p', '4', 'v'), Size(ImageW, ImageH))) && (!this->videoRecorder->init(1, (this->share_path + "/Record/" + "Right/").c_str(), VideoWriter::fourcc('m', 'p', '4', 'v'), Size(ImageW, ImageH)));
     // std::cout<<"视频录制器初始化成功"<<endl;
     this->cameraThread->start(); // changed: Double camera
-    std::cout<<"相机线程开启成功"<<endl;
+    std::cout << "相机线程开启成功" << endl;
     this->_init_flag = true;
     this->logger->info("Init Done");
     this->is_alive = true;
@@ -456,11 +478,11 @@ void Radar::SerWriteLoop()
 void Radar::MainProcessLoop()
 {
     // TODO:可以在哪里把>_cap->Index_Camera_直接传给线程类，然后修改所有访问这个索引的地方
-    std::cout<<"主处理程序开启……"<<endl;
+    std::cout << "主处理程序开启……" << endl;
     while (this->__MainProcessLoop_working)
     {
         auto start_t = std::chrono::system_clock::now().time_since_epoch(); // start time
-        std::cout<<"主处理程序循环……"<<endl;
+        std::cout << "主处理程序循环……" << endl;
 
         // CHECK：若发生错误关闭，尝试再次通过相机线程开启抓图
         if (!this->cameraThread->is_open())
@@ -514,7 +536,6 @@ void Radar::MainProcessLoop()
             this->drawBbox(left_sepTargets, frameBag_0.frame);
             this->drawBbox(right_sepTargets, frameBag_1.frame);
 
-
 #endif
             this->drawArmorsForDebug(left_pred, frameBag_0.frame);
             this->drawArmorsForDebug(right_pred, frameBag_1.frame);
@@ -549,12 +570,16 @@ void Radar::MainProcessLoop()
             }
 #endif
 #endif
-            if (left_pred.size() != 0|| right_pred.size() != 0)
+            if (left_pred.size() != 0 || right_pred.size() != 0)
             {
-                if(left_pred.size() != 0){
-                    this->armor_filter(left_pred);}
-                if(right_pred.size() != 0){
-                    this->armor_filter(right_pred);}
+                if (left_pred.size() != 0)
+                {
+                    this->armor_filter(left_pred);
+                }
+                if (right_pred.size() != 0)
+                {
+                    this->armor_filter(right_pred);
+                }
 
                 shared_lock<shared_timed_mutex> slk_pd(this->myMutex_publicDepth); // 上锁
                 // 获取深度
@@ -591,7 +616,12 @@ void Radar::MainProcessLoop()
                     可以得到按某种顺序排列的3d坐标（正y）
                     */
                     judge_message myJudge_message;
-                    myJudge_message.task = 1; // TODO:不同任务
+                    // add:决策-定点发送工程坐标
+                    myJudge_message.task = 1;                              // TODO:不同任务
+                    if (myJudge_message->UARTPasser->_Fixed_Engineer_Flag) // task2:若工程flag为false 发送定点坐标
+                    {
+                        myJudge_message.task = 2;
+                    }
                     myJudge_message.loc = this->mapMapping->getloc();
                     this->send_judge(myJudge_message);
                     if (myJudge_message.loc.size() > 0)
@@ -626,14 +656,13 @@ void Radar::MainProcessLoop()
             // this->mapMapping->_plot_region_rect(LEFT_CAMERA_IDX,this->show_region, frameBag_0.frame, this->K_0_Mat[0], this->C_0_Mat[0]); // left
             // this->mapMapping->_plot_region_rect(RIGHT_CAMERA_IDX,this->show_region, frameBag_1.frame, this->K_0_Mat[1], this->C_0_Mat[1]); // right
 
-
 #endif
             // changed: 2 Publisher
             sensor_msgs::ImagePtr left_image_msg;
             try
             {
                 left_image_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frameBag_0.frame).toImageMsg();
-                
+
                 left_image_msg->header.frame_id = "radar2023";
                 left_image_msg->header.stamp = ros::Time::now();
                 left_image_msg->header.seq = 1;
@@ -641,7 +670,7 @@ void Radar::MainProcessLoop()
             }
             catch (cv_bridge::Exception &e)
             {
-                 std::cout<<"cv_bridge mistake"<<endl;
+                std::cout << "cv_bridge mistake" << endl;
                 this->logger->error("cv_bridge exception: %s", e.what());
                 this->logger->flush();
                 continue;
@@ -765,7 +794,6 @@ void Radar::spin()
     }
     this->_if_record = VideoRecorderSiginal;
 
-
     // TODO:pnp标定
     if (!this->mapMapping->_is_pass())
     {
@@ -779,19 +807,17 @@ void Radar::spin()
         {
             // 互斥锁
             // unique_lock 对象 ulk 锁住了 myMutex_cameraThread，从而确保在 try 块中的代码执行期间，只有一个线程可以访问由该互斥量保护的资源
-            std::cout<<"start 1st picking"<<endl;
+            std::cout << "start 1st picking" << endl;
             // Mat:不用显示&来修改
             bool pick_left = this->myLocation->locate_pick(this->cameraThread, LEFT_CAMERA_IDX, this->ENEMY, rvec[LEFT_CAMERA_IDX], tvec[LEFT_CAMERA_IDX], this->K_0_Mat[LEFT_CAMERA_IDX], this->C_0_Mat[LEFT_CAMERA_IDX], this->E_0_Mat[LEFT_CAMERA_IDX]);
-            if(pick_left==1)
+            if (pick_left == 1)
             {
-                std::cout<<"finish left picking"<<endl;
-
+                std::cout << "finish left picking" << endl;
             }
             bool pick_right = this->myLocation->locate_pick(this->cameraThread, RIGHT_CAMERA_IDX, this->ENEMY, rvec[RIGHT_CAMERA_IDX], tvec[RIGHT_CAMERA_IDX], this->K_0_Mat[RIGHT_CAMERA_IDX], this->C_0_Mat[RIGHT_CAMERA_IDX], this->E_0_Mat[RIGHT_CAMERA_IDX]);
-                        if(pick_right==1)
+            if (pick_right == 1)
             {
-                std::cout<<"finish right picking"<<endl;
-
+                std::cout << "finish right picking" << endl;
             }
 
             if (!pick_left && !pick_left)

@@ -50,7 +50,41 @@ void UART::Refree_Warning()
     this->Game_refree_warning.count = this->buffer[9]; // add
 }
 
-// void UART::Refree_dart_remaining_time()  //merged
+// 车间通信 雷达站自主决策 子内容id 我方哨兵id 数据段 串口
+void UART::Radar_DoubleInjury_cmd(unsigned int dataID, unsigned char ReceiverId, unsigned char data[1], MySerial::Ptr ser)
+{
+    unsigned char local_buffer[50];
+    /**frame_header**/
+    local_buffer[0] = 0xA5;
+    local_buffer[1] = (7) & 0x00ff; // 数据帧中 data 的长度 6+1=7
+    local_buffer[2] = ((7) & 0xff00) >> 8;
+    local_buffer[3] = 0; // seq
+    local_buffer[4] = this->myHandler.Get_CRC8_Check_Sum(local_buffer, 5 - 1, 0xff);
+    /**cmd_id**/
+    local_buffer[5] = 0x01;
+    local_buffer[6] = 0x03;
+    /**data**/
+    // 子内容id 2-byte 雷达自主决策id 0x0121 data=1
+    local_buffer[7] = dataID & 0x00ff;
+    local_buffer[8] = (dataID & 0xff00) >> 8;
+    // 发送者id 2-byte
+    if (this->ENEMY)
+        local_buffer[9] = 9;
+    else
+        local_buffer[9] = 109;
+    local_buffer[10] = 0;
+    // 接收者id 2-byte
+    local_buffer[11] = ReceiverId & 0x00ff;
+    local_buffer[12] = (ReceiverId & 0xff00) >> 8;
+    // 数据段内容 x<=113
+    local_buffer[13] = data[0];
+
+    myHandler.Append_CRC16_Check_Sum(local_buffer, 7 + 9); // data+6(id)+9=1+6+9
+    unsigned char buffer_tmp_array[7 + 9];
+    for (int i = 0; i < 7 + 9; ++i)
+        buffer_tmp_array[i] = local_buffer[i];
+    ser->mswrite(buffer_tmp_array, 7 + 9);
+}
 
 // 车间通信【与哨兵】-- param in】 子内容id 我方哨兵id 数据段 串口
 void UART::Referee_Transmit_BetweenCar(unsigned int dataID, unsigned char ReceiverId, unsigned char data[48], MySerial::Ptr ser)
@@ -223,7 +257,7 @@ void UART::Robot_Data_Transmit_Map(MySerial::Ptr ser)
     this->ind = (this->ind + 1) % 6;
 }
 
-//用于测试裁判系统
+// 用于测试裁判系统
 #ifdef Referee_sys_Test
 void UART::Robot_Data_Transmit_Map(MySerial::Ptr ser)
 {
@@ -592,6 +626,19 @@ void UART::write(MySerial::Ptr ser)
     // 雷达站敌方车辆位置--by 串口--裁判系统--选手端小地图
     this->Robot_Data_Transmit_Map(ser);
 
+    // func2
+    // 自主决策: 触发易伤
+    if (this->myUARTPasser._trigger_double_flag)
+    {
+        unsigned int radar_cmd_dataID = 0x0121;
+        unsigned char cmd_data[1];
+        unsigned int radar_cmd_Receiver = 0x8080; // 接收者id 2-byte 裁判系统0x8080
+        cmd_data[0] = this->myUARTPasser->_trigger_counter & 0xff;
+        Radar_DoubleInjury_cmd(radar_cmd_dataID, radar_cmd_Receiver, cmd_data, ser);
+    }
+
+    // func3
+    //  给哨兵发敌方的位置
     unsigned int dataID = 0x0200 + (1 & 0xFF); // cmd_id 0x0301 子内容id 0x0200~0x02FF
     unsigned char receiverId;
     if (this->ENEMY)    // red enemy
@@ -615,8 +662,6 @@ void UART::write(MySerial::Ptr ser)
         data[data_p + 6] = t_y[2];
         data[data_p + 7] = t_y[3];
     }
-    // func2
-    //  给哨兵发敌方的位置
     Referee_Transmit_BetweenCar(dataID, receiverId, data, ser);
 
     usleep(100000); // 100 000us-100ms--0.1s--10Hz

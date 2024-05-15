@@ -4,6 +4,7 @@
 // #define UsingVideo  // 是否使用视频(！！！可能造成OOM, 请注意设置FRAME_DEPTH)
 // #define ShowDepth // 是否在GUI覆盖深度图
 // #define Referee_sys_Test
+#define FixedEngineer
 
 /*---Common settings---*/
 #define lidarTopicName (char *)"/livox/lidar"

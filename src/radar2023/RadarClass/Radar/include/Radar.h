@@ -1,7 +1,6 @@
 #ifndef __RADAR_H
 #define __RADAR_H
 
-
 #include "../../Common/include/public.h"
 #include "../../Camera/include/camera.h"
 #include "../../Camera/include/VideoRecorder.h"
@@ -29,6 +28,11 @@
 
 #include <radar2023/Locations.h>
 #include <radar2023/Location.h>
+
+#define BLUE_ENGINEER_X 14.0
+#define BLUE_ENGINEER_Y 7.5
+#define RED_ENGINEER_X 14.0
+#define RED_ENGINEER_Y 7.5
 
 /**
  * @brief 主要雷达类

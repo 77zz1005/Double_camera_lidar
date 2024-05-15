@@ -2,6 +2,7 @@
 #define UARTPASSER_H
 
 #include "../../Common/include/public.h"
+#include "../include/GameData.h"
 
 /**
  * @brief UART传递
@@ -32,13 +33,21 @@ public:
     float _event_prevent[6] = {0.f};
     int loop_send = 0;
 
+    /************自主决策************/
+    bool _Fixed_Engineer_Flag = false;
+
+    // 双倍易伤
+    radar_info _radar_info;
+    int _Double_Now_Num = 0; // 雷达是否有易伤的机会 开局为0,至多为2
+    int _Double_Last_Num = 0;
+    int _trigger_counter = 0;
+    bool _trigger_double_flag = false;
+    bool _Enemy_Double_Injury_State = false; // 0未触发 1触发
+
 #ifdef Referee_sys_Test
     vector<vector<float>> _test_robot_location = vector<vector<float>>{{0.0f, 0.0f}, {25.0 / 5.0, -18.0 / 5.0}, {25.0 / 5.0 * 2.0, -18.0 / 5.0 * 2.0}, {25.0 / 5.0 * 3.0, -18.0 / 5.0 * 3.0}, {25.0 / 5.0 * 4.0, -18.0 / 5.0 * 4.0}, {25.0, -18.0}};
 #endif
     // add: radar
-    // 双倍易伤
-    int _Injury_Num = 0;              // 雷达是否有易伤的机会 开局为0,至多为2
-    bool _Enemy_Injury_State = false; // 0未触发 1触发
     // 标记进度:英雄 工程 步兵3/4/5 哨兵
     int _Mark_Enemy_Process[6] = {0};
 
