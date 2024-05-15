@@ -133,7 +133,7 @@ void UARTPasser::Radar_Injury_State(unsigned char *buffer)
             this->_trigger_double_flag = false;
         }
     }
-    else if (this->_Double_Injury_Num == 0)
+    else
     {
         this->_trigger_double_flag = false;
     }

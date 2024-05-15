@@ -6,13 +6,14 @@
 TO TEST:设计决策，完善串口通信 
 * 开局一分钟左右发送工程定点坐标
    TODO:在Radar.h中修改：
-   #define BLUE_ENGINEER_X 14.0
-   #define BLUE_ENGINEER_Y 7.5
-   #define RED_ENGINEER_X 14.0
-   #define RED_ENGINEER_Y 7.5
+
+         #define BLUE_ENGINEER_X 14.0
+         #define BLUE_ENGINEER_Y 7.5
+         #define RED_ENGINEER_X 14.0
+         #define RED_ENGINEER_Y 7.5
 * 自动决定易伤
    注：没有定位模块，暂时无法测试
-   
+
 #### 双相机方案
 1.单相机-->双相机
    * （1）如何区分左右相机 

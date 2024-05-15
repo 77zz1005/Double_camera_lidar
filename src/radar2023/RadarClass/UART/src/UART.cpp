@@ -633,7 +633,7 @@ void UART::write(MySerial::Ptr ser)
         unsigned int radar_cmd_dataID = 0x0121;
         unsigned char cmd_data[1];
         unsigned int radar_cmd_Receiver = 0x8080; // 接收者id 2-byte 裁判系统0x8080
-        cmd_data[0] = this->myUARTPasser->_trigger_counter & 0xff;
+        cmd_data[0] = this->myUARTPasser._trigger_counter & 0xff;
         Radar_DoubleInjury_cmd(radar_cmd_dataID, radar_cmd_Receiver, cmd_data, ser);
     }
 

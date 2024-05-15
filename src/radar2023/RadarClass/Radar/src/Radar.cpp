@@ -103,22 +103,22 @@ void Radar::send_judge(judge_message &message)
         for (int i = 0; i < int(message.loc.size() / 2); ++i)
         {
             vector<float> temp_location;
+            if(i==1&&!message.loc[i + this->ENEMY * 6].flag)
+            {
+                if (this->ENEMY) // ENEMY blue
+                {
+                    message.loc[i + this->ENEMY * 6].x = BLUE_ENGINEER_X;
+                    message.loc[i + this->ENEMY * 6].y = BLUE_ENGINEER_Y;
+                }
+                else // ENEMY red
+                {
+                    message.loc[i + this->ENEMY * 6].x = RED_ENGINEER_X;
+                    message.loc[i + this->ENEMY * 6].y = RED_ENGINEER_Y;
+                }
+            }
             temp_location.emplace_back(message.loc[i + this->ENEMY * 6].x);
             temp_location.emplace_back(message.loc[i + this->ENEMY * 6].y);
             loc.emplace_back(temp_location);
-        }
-        if (!loc[1].flag) // 如果没有识别到工程 定点发送工程坐标
-        {
-            if (this->ENEMY) // ENEMY blue
-            {
-                loc[1].x = BLUE_ENGINEER_X;
-                loc[1].y = BLUE_ENGINEER_Y;
-            }
-            else // ENEMY red
-            {
-                loc[1].x = RED_ENGINEER_X;
-                loc[1].y = RED_ENGINEER_Y;
-            }
         }
         this->myUART->myUARTPasser.push_loc(loc);
         break;
@@ -617,7 +617,7 @@ void Radar::MainProcessLoop()
                     judge_message myJudge_message;
                     // add:决策-定点发送工程坐标
                     myJudge_message.task = 1;                              // TODO:不同任务
-                    if (myJudge_message->UARTPasser->_Fixed_Engineer_Flag) // task2:若工程flag为false 发送定点坐标
+                    if (this->myUART->myUARTPasser._Fixed_Engineer_Flag) // task2:若工程flag为false 发送定点坐标
                     {
                         myJudge_message.task = 2;
                     }
