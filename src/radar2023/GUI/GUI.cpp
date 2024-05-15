@@ -52,7 +52,6 @@ void right_image_msgCallback(const sensor_msgs::ImageConstPtr &msg)
     }
 }
 
-#ifdef DoubleGui
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "gui_node");
@@ -238,4 +237,3 @@ int main(int argc, char **argv)
     ros::shutdown();
     return 0;
 }
-#endif
