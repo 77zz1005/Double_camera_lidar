@@ -5,6 +5,7 @@
 // #define ShowDepth // 是否在GUI覆盖深度图
 // #define Referee_sys_Test
 #define FixedEngineer
+// #define SingleGui
 
 /*---Common settings---*/
 #define lidarTopicName (char *)"/livox/lidar"
