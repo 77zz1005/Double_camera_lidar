@@ -50,6 +50,7 @@ public:
     // add: radar
     // 标记进度:英雄 工程 步兵3/4/5 哨兵
     int _Mark_Enemy_Process[6] = {0};
+    int _Last_Mark_Enemy_Process[6] = {0};
 
 public:
     UARTPasser();

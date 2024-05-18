@@ -109,6 +109,11 @@ void UARTPasser::Mark_Enemy_Process(unsigned char *buffer)
             std::cout << std::to_string(this->_Mark_Enemy_Process[5]) << endl;
         }
     }
+
+    // TODO:根据进度决策
+
+    // 本次进度作为缓存
+    this->_Last_Mark_Enemy_Process = this->_Mark_Enemy_Process;
 }
 
 void UARTPasser::Radar_Injury_State(unsigned char *buffer)
