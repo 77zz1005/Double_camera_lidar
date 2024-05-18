@@ -46,14 +46,29 @@ void UARTPasser::Refree_MapLocationSelf_Message()
 void UARTPasser::Referee_Update_GameData(unsigned char *buffer)
 {
     // 雷达站只需要判断比赛阶段-buffer[7]的高4位信息
-    if (this->_Now_stage < 2 && ((buffer[7] >> 4) == 2 || (buffer[7] >> 4) == 3 || (buffer[7] >> 4) == 4)) // 为了刚好在比赛开始那个时刻更新flag
+    if (this->_Now_stage < 4 && (buffer[7] >> 4) == 4) // 为了刚好在比赛开始那个时刻更新flag
     {
         this->_Game_Start_Flag = true;
         this->_set_max_flag = true;
-        this->Remain_time = 420;
         this->logger->critical("GAME START !");
     }
-    // TODO:是否需要读取remain_time 进行决策
+
+#ifdef FixedEngineer
+    // 为了给工程发送定点坐标
+    if (this->_Game_Start_Flag)
+    {
+
+        this->Remain_time = this->bytes2Int(buffer[8], buffer[9]);
+        if (this->Remain_time <= 420 && this->Remain_time > 360)
+            this->_Fixed_Engineer_Flag = true;
+        else
+        {
+            this->_Fixed_Engineer_Flag = false;
+        }
+    }
+#endif
+
+    // 读取游戏是否结束
     if (this->_Now_stage < 5 && (buffer[7] >> 4) == 5)
     {
         this->_Game_End_Flag = true;
@@ -64,19 +79,9 @@ void UARTPasser::Referee_Update_GameData(unsigned char *buffer)
         }
         this->Remain_time = 0;
     }
-    this->_Now_stage = buffer[7] >> 4; // 更新
 
-    // 为了给工程发送定点坐标
-    if (this->_Now_stage == 4) // 更新
-    {
-        int time = this->bytes2Int(buffer[8], buffer[9]);
-        if (time <= 420 && time > 360)
-            this->_Fixed_Engineer_Flag = true;
-        else
-        {
-            this->_Fixed_Engineer_Flag = false;
-        }
-    }
+    // 更新阶段
+    this->_Now_stage = buffer[7] >> 4;
 }
 
 void UARTPasser::Referee_Robot_HP(unsigned char *buffer)

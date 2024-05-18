@@ -407,34 +407,28 @@ void MapMapping::mergeUpdata(vector<bboxAndRect> &left_pred, vector<bboxAndRect>
                     }
                 }
             }
-            // 注：这里有这么多Z_A和类似的代码，可能是因为当初为了测试Z_A功能
+
             // 默认Z_A为true 参考的是上交的方法
             // 更新容器中的数据 （为了后续数据处理）
             if (Z_A)
             {
                 if (al.flag)
-                    cache_pred.emplace_back(al);
+                    cache_pred.emplace_back(al); // 缓存
             }
             if (al.flag)
-                pred_loc.emplace_back(al);
+                pred_loc.emplace_back(al); // 预测
             ++iter;
-            /*
-            由    bool flag = false;
-                    int id = -1;
-                    float x = 0., y = 0., z = 0.;
-            flag最大的作用是确定里面会不会有被处理好的3d数据
-            */
         }
 
         // 更新:将此次id x y z作为下一次的缓存数据
         if (Z_A)
         {
-            if (pred_loc.size() > 0)
+            if (pred_loc.size() > 0) // 预测
             {
                 this->cached_location3D.clear();
                 for (auto it : pred_loc)
                 {
-                    this->cached_location3D.emplace_back(it);
+                    this->cached_location3D.emplace_back(it); // 3d预测
                 }
             }
         }

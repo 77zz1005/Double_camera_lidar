@@ -50,7 +50,7 @@ void UART::Refree_Warning()
     this->Game_refree_warning.count = this->buffer[9]; // add
 }
 
-// 车间通信 雷达站自主决策 子内容id 我方哨兵id 数据段 串口
+// 车间通信 雷达站自主决策 雷达id 裁判系统id 数据段 串口
 void UART::Radar_DoubleInjury_cmd(unsigned int dataID, unsigned char ReceiverId, unsigned char data[1], MySerial::Ptr ser)
 {
     unsigned char local_buffer[50];

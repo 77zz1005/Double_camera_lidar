@@ -103,18 +103,24 @@ void Radar::send_judge(judge_message &message)
         for (int i = 0; i < int(message.loc.size() / 2); ++i)
         {
             vector<float> temp_location;
-            if(i==1&&!message.loc[i + this->ENEMY * 6].flag)
+            if (i == 1 && (message.loc[i + this->ENEMY * 6].id == -1 || message.loc[i + this->ENEMY * 6].flag = false)) // 没有对应工程id的识别框 或没有正确结算出位置
             {
+                MapLocation3D engineer;
                 if (this->ENEMY) // ENEMY blue
                 {
-                    message.loc[i + this->ENEMY * 6].x = BLUE_ENGINEER_X;
-                    message.loc[i + this->ENEMY * 6].y = BLUE_ENGINEER_Y;
+                    engineer.x = BLUE_ENGINEER_X;
+                    engineer.y = BLUE_ENGINEER_Y;
+                    engineer.flag = true;
                 }
                 else // ENEMY red
                 {
-                    message.loc[i + this->ENEMY * 6].x = RED_ENGINEER_X;
-                    message.loc[i + this->ENEMY * 6].y = RED_ENGINEER_Y;
+                    engineer.x = RED_ENGINEER_X;
+                    engineer.y = RED_ENGINEER_Y;
+                    engineer.flag = true;
                 }
+                temp_location.emplace_back(engineer.x);
+                temp_location.emplace_back(engineer.y);
+                continue;
             }
             temp_location.emplace_back(message.loc[i + this->ENEMY * 6].x);
             temp_location.emplace_back(message.loc[i + this->ENEMY * 6].y);
@@ -616,7 +622,7 @@ void Radar::MainProcessLoop()
                     */
                     judge_message myJudge_message;
                     // add:决策-定点发送工程坐标
-                    myJudge_message.task = 1;                              // TODO:不同任务
+                    myJudge_message.task = 1;                            // TODO:不同任务
                     if (this->myUART->myUARTPasser._Fixed_Engineer_Flag) // task2:若工程flag为false 发送定点坐标
                     {
                         myJudge_message.task = 2;
