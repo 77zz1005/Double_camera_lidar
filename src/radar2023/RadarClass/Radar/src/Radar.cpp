@@ -103,7 +103,7 @@ void Radar::send_judge(judge_message &message)
         for (int i = 0; i < int(message.loc.size() / 2); ++i)
         {
             vector<float> temp_location;
-            if (i == 1 && (message.loc[i + this->ENEMY * 6].id == -1 || message.loc[i + this->ENEMY * 6].flag = false)) // 没有对应工程id的识别框 或没有正确结算出位置
+            if (i == 1 && (message.loc[i + this->ENEMY * 6].id == -1 || message.loc[i + this->ENEMY * 6].flag == false)) // 没有对应工程id的识别框 或没有正确结算出位置
             {
                 MapLocation3D engineer;
                 if (this->ENEMY) // ENEMY blue

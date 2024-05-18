@@ -121,7 +121,7 @@ void UARTPasser::Radar_Injury_State(unsigned char *buffer)
     // 我方易伤机会
     this->_Double_Now_Num = (buffer[7] & 0x03); // 0x03==0000 0011 提取 0-1 位:使用按位与操作将 buffer[7] 的高 6 位清零，只保留低 2 位
     // 敌方被触发易伤状态
-    this->_Enemy_Double_Injury_State = (buffer[7] & 0x04) >> 2; // 提取第 2 位:与 只保留第 2 位(其余清0)，并右移 2 位
+    this->_Enemy_Double_Injury_State = (buffer[7] & 0x04) >> 2; // 提取第 2 位:与 只保留第 2 位(其余清0)，并右移 2 位;隐式转为bool
 
     if (this->_Double_Now_Num > this->_Double_Last_Num)
     {
